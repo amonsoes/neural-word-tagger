@@ -1,15 +1,27 @@
 import random
 import torch
+import argparse
 
 from sys import argv
 from classes import tagger as tg
 
 parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
-parser.add_argument('parfile', input=string, help='set file to load/dump data attributes. Needs suffix')
+
+#positional args
+parser.add_argument('parfile', input=str, help='set file to load/dump data attributes. Needs suffix')
+
+#optional args
+parser.add_argument('--num_epochs', input=int, help='set the number of epochs of the training')
+parser.add_argument('--num_words', input=int, help='set the number of words. This will impact the training speed, but also affects quality')
+parser.add_argument('--emb_size', input=int, help='set the number of dimensions of the embedding matrix. This will impact the training speed, but also affects quality')
+parser.add_argument('--rnn_size', input=int, help='set the number of dimensions of the LSTM vector. This will impact the training speed, but also affects quality')
+parser.add_argument('--dropout_rate', input=float, help='set the dropout rate')
+parser.add_argument('--learning_rate', input=float, help='set the learning rate of the optimizer')
+
 parser.parse_args()
 
 def train(data, tagger, numEpochs):
-    optimizier = torch.optim.Adam(tagger.parameters(), lr=0.001)
+    optimizier = torch.optim.Adam(tagger.parameters(), lr=args.learning_rate)
     best_current_acc = 0.0
     for epoch in range(numEpochs):
         for x, y in data.trainSentences:
@@ -32,13 +44,14 @@ def train(data, tagger, numEpochs):
 
 if __name__ == '__main__':
     
-    NUMWORDS = 10000
-    EMBSIZE = 200
-    RNNSIZE = 200
-    NUMEPOCHS = 20
+    NUMWORDS = args.num_words
+    EMBSIZE = args.emb_size
+    RNNSIZE = args.rnn_size
+    NUMEPOCHS = args.num_epochs
+    DO_RATE = args.dropout_rate
     ftrain = "./data/train.tagged"
     fdev = "./data/dev.tagged"
     
     data = tg.Data(ftrain, fdev, NUMWORDS)
-    tagger = tg.TaggerModel(NUMWORDS, data.numTags, EMBSIZE, RNNSIZE, 0.1)
+    tagger = tg.TaggerModel(NUMWORDS, data.numTags, EMBSIZE, RNNSIZE, DO_RATE)
     train(data, tagger, 5)

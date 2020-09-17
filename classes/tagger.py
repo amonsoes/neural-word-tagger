@@ -7,8 +7,8 @@ from torch import nn
 from collections import Counter
 
 parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
-parser.add_argument('parfile1', input=string, help='set file to load/dump data attributes. Needs suffix')
-parser.add_argument('parfile2', input=string, help='set file to load/dump data attributes. Needs suffix')
+parser.add_argument('parfile1', input=str, help='set file to load/dump data attributes. Needs suffix')
+parser.add_argument('parfile2', input=str, help='set file to load/dump data attributes. Needs suffix')
 parser.parse_args()
 
 
