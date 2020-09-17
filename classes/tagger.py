@@ -14,6 +14,7 @@ parser.parse_args()
 
 class Data:
     
+    
     def __init__(self, *args):
         if len(args) == 1:
             self.init_test(*args)
@@ -21,15 +22,14 @@ class Data:
             self.init_train(*args)
     
     def init_test(self, *args):
-        pickle.load(args.parfile1+'.io')
-        pickle.load(args.parfile2+'.io')
+        self.tag_id = json.load(args.parfile1+'.io')
+        self.word_id = json.load(args.parfile2+'.io')
     
     def init_train(self,trainFile, devFile, numWords):
         self.trainSentences = self.readData(trainFile, True, numWords)
         self.devSentences = self.readData(devFile, False)
         self.numTags = len(self.tag_id)
         
-    
     def readData(self, file, train, numwords=None):
         if train:
             wordFreq = Counter()
@@ -47,7 +47,6 @@ class Data:
                     if train:
                         wordFreq[word] += 1
                         tag_set.add(tag)
-                        
         if train:
             self.word_id = {w[0] : e+1 for e,w in enumerate(wordFreq.most_common(numwords))}
             #self.word_id['UNK'] will be implicitly 0
@@ -56,6 +55,18 @@ class Data:
             self.id_tag = { i : t for t,i in self.tag_id.items()}
             return sents
         return sents
+    
+    def sentences(self, file):
+        with open(file, 'r', encoding='utf-8') as f:
+            sent = []
+            for line in f:
+                if line == '\n':
+                    yield sent #sents.append((words, tags))
+                    sent = []
+                else:
+                    word = line.strip()
+                    word.append(sent)
+                    
     
     def words2IDs(self, words):
         return [self.word_id.get(w,0) for w in words]
@@ -66,11 +77,10 @@ class Data:
     def IDs2tags(self, bestTagIDs):
         return [self.id_tag[i] for i in bestTagIDs]
     
-    def store_parameters(self, path):
-        json.dump(self.word_id, path)
-        json.dump
+    def store_parameters(self, path1, path2):
+        json.dump(self.word_id, path1)
+        json.dump(self.tag_id, path2)
         
-    
     def run_test(self):
         for words, tags in self.trainSentences:
             print(self.words2IDs(words))
