@@ -1,15 +1,34 @@
 import torch
 import sys
+import json
+import argparse
 
 from torch import nn
 from collections import Counter
 
+parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
+parser.add_argument('parfile1', input=string, help='set file to load/dump data attributes. Needs suffix')
+parser.add_argument('parfile2', input=string, help='set file to load/dump data attributes. Needs suffix')
+parser.parse_args()
+
+
 class Data:
     
-    def __init__(self, trainFile, devFile, numWords):
+    def __init__(self, *args):
+        if len(args) == 1:
+            self.init_test(*args)
+        else:
+            self.init_train(*args)
+    
+    def init_test(self, *args):
+        pickle.load(args.parfile1+'.io')
+        pickle.load(args.parfile2+'.io')
+    
+    def init_train(self,trainFile, devFile, numWords):
         self.trainSentences = self.readData(trainFile, True, numWords)
         self.devSentences = self.readData(devFile, False)
         self.numTags = len(self.tag_id)
+        
     
     def readData(self, file, train, numwords=None):
         if train:
@@ -28,9 +47,10 @@ class Data:
                     if train:
                         wordFreq[word] += 1
                         tag_set.add(tag)
+                        
         if train:
             self.word_id = {w[0] : e+1 for e,w in enumerate(wordFreq.most_common(numwords))}
-            # self.word_id['UNK'] will be implicitly 0
+            #self.word_id['UNK'] will be implicitly 0
             self.tag_id = {t : e+1 for e,t in enumerate(tag_set)}
             self.tag_id['UNK'] = 0
             self.id_tag = { i : t for t,i in self.tag_id.items()}
@@ -46,6 +66,11 @@ class Data:
     def IDs2tags(self, bestTagIDs):
         return [self.id_tag[i] for i in bestTagIDs]
     
+    def store_parameters(self, path):
+        json.dump(self.word_id, path)
+        json.dump
+        
+    
     def run_test(self):
         for words, tags in self.trainSentences:
             print(self.words2IDs(words))
@@ -53,7 +78,7 @@ class Data:
         for words, tags in self.devSentences:
             print(words, " : " , tags )
             print(self.words2IDs(words))
-            print(self.IDs2tags([2,5,12]))
+        print(self.IDs2tags([2,5,12]))
             
         print("\n====== Data class functionality successfully tested ======\n")
         
@@ -78,22 +103,21 @@ class TaggerModel(nn.Module):
         
 def run_test():
     
-    NUMWORDS = 20
-    EMBSIZE = 60
-    ftrain = sys.argv[1]
+    NUMWORDS = 10000
+    EMBSIZE = 200
+    RNNSIZE = 200
+    ftrain = sys.argv[1] 
     fdev = sys.argv[2]
     
     data = Data(ftrain, fdev, NUMWORDS)
-    tagger = TaggerModel(NUMWORDS, data.numTags, EMBSIZE, 0.1)
+    tagger = TaggerModel(NUMWORDS, data.numTags, EMBSIZE, RNNSIZE, 0.1)
     
     print("\n====== Models successfully initialized ======\n")
     
     data.run_test()
-    print(tagger(torch.LongTensor([2,5,12])))
-    
+    print(tagger(torch.LongTensor([2,5,12])).size())
     
     print("\n====== Tagger class functionality successfully tested ======\n")
     
 if __name__ == '__main__':
     run_test()
-    
