@@ -54,4 +54,4 @@ if __name__ == '__main__':
     
     data = tg.Data(ftrain, fdev, NUMWORDS)
     tagger = tg.TaggerModel(NUMWORDS, data.numTags, EMBSIZE, RNNSIZE, DO_RATE)
-    train(data, tagger, 5)
+    train(data, tagger, NUMEPOCHS)
