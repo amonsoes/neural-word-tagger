@@ -1,5 +1,4 @@
 import torch
-import sys
 import json
 import argparse
 
@@ -7,9 +6,11 @@ from torch import nn
 from collections import Counter
 
 parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
-parser.add_argument('parfile1', input=str, help='set file to load/dump data attributes. Needs suffix')
-parser.add_argument('parfile2', input=str, help='set file to load/dump data attributes. Needs suffix')
-parser.parse_args()
+parser.add_argument('--parfile', type=str, help='set file to load/dump data attributes. Needs suffix')
+parser.add_argument('--train', type=str, help='set training file')
+parser.add_argument('--dev', type=str, help='set dev file')
+
+args = parser.parse_args()
 
 
 class Data:
@@ -22,8 +23,7 @@ class Data:
             self.init_train(*args)
     
     def init_test(self, *args):
-        self.tag_id = json.load(args.parfile1+'.io')
-        self.word_id = json.load(args.parfile2+'.io')
+        self.tag_id, self.word_id = json.load(args.parfile+'.io')
     
     def init_train(self,trainFile, devFile, numWords):
         self.trainSentences = self.readData(trainFile, True, numWords)
@@ -61,15 +61,15 @@ class Data:
             sent = []
             for line in f:
                 if line == '\n':
-                    yield sent #sents.append((words, tags))
+                    yield sent
                     sent = []
                 else:
                     word = line.strip()
-                    word.append(sent)
+                    sent.append(word)
                     
     
     def words2IDs(self, words):
-        return [self.word_id.get(w,0) for w in words]
+        return [self.word_id.get(w, 0) for w in words]
         
     def tags2IDs(self, tags):
         return [self.tag_id[t] for t in tags]
@@ -77,9 +77,9 @@ class Data:
     def IDs2tags(self, bestTagIDs):
         return [self.id_tag[i] for i in bestTagIDs]
     
-    def store_parameters(self, path1, path2):
-        json.dump(self.word_id, path1)
-        json.dump(self.tag_id, path2)
+    def store_parameters(self, path):
+        with open(path, 'w+', encoding='utf-8') as f:
+            json.dump((self.word_id, self.tag_id), f)
         
     def run_test(self):
         for words, tags in self.trainSentences:
@@ -116,11 +116,11 @@ def run_test():
     NUMWORDS = 10000
     EMBSIZE = 200
     RNNSIZE = 200
-    ftrain = sys.argv[1] 
-    fdev = sys.argv[2]
     
-    data = Data(ftrain, fdev, NUMWORDS)
+    data = Data(args.train, args.dev, NUMWORDS)
     tagger = TaggerModel(NUMWORDS, data.numTags, EMBSIZE, RNNSIZE, 0.1)
+    
+    data.store_parameters(args.parfile+'.io')
     
     print("\n====== Models successfully initialized ======\n")
     
@@ -131,3 +131,4 @@ def run_test():
     
 if __name__ == '__main__':
     run_test()
+    

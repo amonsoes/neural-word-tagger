@@ -11,12 +11,12 @@ parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
 parser.add_argument('parfile', input=str, help='set file to load/dump data attributes. Needs suffix')
 
 #optional args
-parser.add_argument('--num_epochs', input=int, help='set the number of epochs of the training')
-parser.add_argument('--num_words', input=int, help='set the number of words. This will impact the training speed, but also affects quality')
-parser.add_argument('--emb_size', input=int, help='set the number of dimensions of the embedding matrix. This will impact the training speed, but also affects quality')
-parser.add_argument('--rnn_size', input=int, help='set the number of dimensions of the LSTM vector. This will impact the training speed, but also affects quality')
-parser.add_argument('--dropout_rate', input=float, help='set the dropout rate')
-parser.add_argument('--learning_rate', input=float, help='set the learning rate of the optimizer')
+parser.add_argument('--num_epochs', type=int, help='set the number of epochs of the training')
+parser.add_argument('--num_words', type=int, help='set the number of words. This will impact the training speed, but also affects quality')
+parser.add_argument('--emb_size', type=int, help='set the number of dimensions of the embedding matrix. This will impact the training speed, but also affects quality')
+parser.add_argument('--rnn_size', type=int, help='set the number of dimensions of the LSTM vector. This will impact the training speed, but also affects quality')
+parser.add_argument('--dropout_rate', type=float, help='set the dropout rate')
+parser.add_argument('--learning_rate', type=float, help='set the learning rate of the optimizer')
 
 parser.parse_args()
 
