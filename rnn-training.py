@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
 
 #positional args
 parser.add_argument('parfile', input=str, help='set file to load/dump data attributes. Needs suffix')
+parser.add_argument('gpu', type=bool, help='set True if cuda-able GPU is available. Else set False')
 
 #optional args
 parser.add_argument('--num_epochs', type=int, help='set the number of epochs of the training')
@@ -21,6 +22,8 @@ parser.add_argument('--learning_rate', type=float, help='set the learning rate o
 args = parser.parse_args()
 
 def train(data, tagger, numEpochs):
+    if args.gpu:
+        tagger.cuda()
     optimizier = torch.optim.Adam(tagger.parameters(), lr=args.learning_rate)
     best_current_acc = 0.0
     for epoch in range(numEpochs):
