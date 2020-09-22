@@ -18,7 +18,7 @@ parser.add_argument('--rnn_size', type=int, help='set the number of dimensions o
 parser.add_argument('--dropout_rate', type=float, help='set the dropout rate')
 parser.add_argument('--learning_rate', type=float, help='set the learning rate of the optimizer')
 
-parser.parse_args()
+args = parser.parse_args()
 
 def train(data, tagger, numEpochs):
     optimizier = torch.optim.Adam(tagger.parameters(), lr=args.learning_rate)

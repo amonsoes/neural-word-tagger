@@ -23,7 +23,9 @@ class Data:
             self.init_train(*args)
     
     def init_test(self, *args):
-        self.tag_id, self.word_id = json.load(args.parfile+'.io')
+        with open(args.parfile, 'r',) as f:
+            self.tag_id, self.word_id = json.load(f)
+        self.numTags = len(self.tag_id.keys())
     
     def init_train(self,trainFile, devFile, numWords):
         self.trainSentences = self.readData(trainFile, True, numWords)
@@ -117,7 +119,7 @@ def run_test():
     EMBSIZE = 200
     RNNSIZE = 200
     
-    data = Data(args.train, args.dev, NUMWORDS)
+    data = Data(args.parfile)
     tagger = TaggerModel(NUMWORDS, data.numTags, EMBSIZE, RNNSIZE, 0.1)
     
     data.store_parameters(args.parfile+'.io')
