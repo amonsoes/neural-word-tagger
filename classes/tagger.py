@@ -5,13 +5,6 @@ import argparse
 from torch import nn
 from collections import Counter
 
-parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
-parser.add_argument('--parfile', type=str, help='set file to load/dump data attributes. Needs suffix')
-parser.add_argument('--train', type=str, help='set training file')
-parser.add_argument('--dev', type=str, help='set dev file')
-
-args = parser.parse_args()
-
 
 class Data:
     
@@ -132,5 +125,12 @@ def run_test():
     print("\n====== Tagger class functionality successfully tested ======\n")
     
 if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
+    parser.add_argument('--parfile', type=str, help='set file to load/dump data attributes. Needs suffix')
+    parser.add_argument('--train', type=str, help='set training file')
+    parser.add_argument('--dev', type=str, help='set dev file')
+
+    args = parser.parse_args()
     run_test()
     
