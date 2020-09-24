@@ -96,13 +96,15 @@ class TaggerModel(nn.Module):
         self.lstm = nn.LSTM(embSize, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
         self.fc = nn.Linear(rnnSize*2, numTags)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
     def forward(self, input):
-        embeddings = self.embedding_layer(input)
-        do_embeddings = self.dropout(embeddings)
+        input = input.cuda()
+        embeddings = self.embedding_layer(input).cuda()
+        do_embeddings = self.dropout(embeddings).cuda()
         output, _ = self.lstm(torch.unsqueeze(do_embeddings, dim=0))
-        do_vector = self.dropout(torch.squeeze(output, dim=0))
-        output = self.fc(do_vector)
+        do_vector = self.dropout(torch.squeeze(output.cuda(), dim=0)).cuda()
+        output = self.fc(do_vector).cuda()
         return output
         
         

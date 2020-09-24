@@ -8,6 +8,7 @@ from classes import tagger as tg
 def train(data, tagger, numEpochs):
     if args.gpu:
         tagger.cuda()
+        tagger.to(tagger.device)
     else:
         print('\nWARNING: Cuda not available. Training initialized on CPU\n')
     optimizier = torch.optim.Adam(tagger.parameters(), lr=args.learning_rate)
@@ -16,7 +17,7 @@ def train(data, tagger, numEpochs):
         for x, y in data.trainSentences:
             output = tagger(torch.LongTensor(data.words2IDs(x)))
             loss = torch.nn.CrossEntropyLoss()
-            loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)))
+            loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda())
             loss_output.backward()
             optimizier.step()
         random.shuffle(data.trainSentences)
@@ -29,6 +30,7 @@ def train(data, tagger, numEpochs):
         accuracy = sum_corr / total_tagged
         if accuracy > best_current_acc:
             best_current_acc = accuracy
+            print("====\nBEST ACCURACY CHANGED : {}\n====".format(best_current_acc))
             torch.save(tagger, args.parfile+'.rnn')
 
 if __name__ == '__main__':
