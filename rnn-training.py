@@ -6,19 +6,22 @@ from sys import argv
 from classes import tagger as tg
 
 def train(data, tagger, numEpochs):
+    tagger.train()
     if args.gpu:
         tagger.cuda()
         tagger.to(tagger.device)
     else:
         print('\nWARNING: Cuda not available. Training initialized on CPU\n')
-    optimizier = torch.optim.Adam(tagger.parameters(), lr=args.learning_rate)
+    optimizier = torch.optim.SGD(tagger.parameters(), lr=args.learning_rate)
     best_current_acc = 0.0
     for epoch in range(numEpochs):
         for x, y in data.trainSentences:
+            optimizier.zero_grad()
             output = tagger(torch.LongTensor(data.words2IDs(x)))
-            loss = torch.nn.CrossEntropyLoss()
+            loss = torch.nn.CrossEntropyLoss().cuda()
             loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda())
             loss_output.backward()
+            print(loss_output)
             optimizier.step()
         random.shuffle(data.trainSentences)
         tagger.train(mode=False)
@@ -32,6 +35,8 @@ def train(data, tagger, numEpochs):
             best_current_acc = accuracy
             print("====\nBEST ACCURACY CHANGED : {}\n====".format(best_current_acc))
             torch.save(tagger, args.parfile+'.rnn')
+        else:
+            print('====\nACCURACY NOT IMPROVED\n====')
 
 if __name__ == '__main__':
     
