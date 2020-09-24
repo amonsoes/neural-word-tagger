@@ -5,38 +5,44 @@ import argparse
 from sys import argv
 from classes import tagger as tg
 
-def train(data, tagger, numEpochs):
+def optimize(x, y, optimizer, model):
+    optimizer.zero_grad()
+    output = model(torch.LongTensor(data.words2IDs(x)))
+    loss = torch.nn.CrossEntropyLoss().cuda()
+    loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda())
+    loss_output.backward()
+    print(loss_output)
+    optimizer.step()
+
+def dev_evaluate(x, y, model, total_tagged, sum_corr):
+    total_tagged += len(y)
+    output = tagger(torch.LongTensor(data.words2IDs(x)))
+    sum_corr += sum([1 for ix,iy in zip(output,torch.LongTensor(data.tags2IDs(y))) if torch.argmax(ix).item() == iy.item()])
+    accuracy = sum_corr / total_tagged
+    return accuracy
+
+def check_accuracy(accuracy, best_current_accuracy, model):
+    if accuracy > best_current_accuracy:
+        best_current_accuracy = accuracy
+        print("====\nBEST ACCURACY CHANGED : {}\n====".format(best_current_accuracy))
+        torch.save(model, args.parfile+'.rnn')
+    return best_current_accuracy
+    
+def train(data, tagger, numEpochs, optimizer):
     tagger.train()
     if args.gpu:
         tagger.cuda()
         tagger.to(tagger.device)
-    else:
-        print('\nWARNING: Cuda not available. Training initialized on CPU\n')
-    optimizier = torch.optim.SGD(tagger.parameters(), lr=args.learning_rate)
     best_current_acc = 0.0
     for epoch in range(numEpochs):
         for x, y in data.trainSentences:
-            optimizier.zero_grad()
-            output = tagger(torch.LongTensor(data.words2IDs(x)))
-            loss = torch.nn.CrossEntropyLoss().cuda()
-            loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda())
-            loss_output.backward()
-            print(loss_output)
-            optimizier.step()
+            optimize(x, y, optimizer, tagger)
         random.shuffle(data.trainSentences)
         tagger.train(mode=False)
         total_tagged, sum_corr = 0, 0
         for x, y in data.devSentences:
-            total_tagged += len(y)
-            output = tagger(torch.LongTensor(data.words2IDs(x)))
-            sum_corr += sum([1 for ix,iy in zip(output,torch.LongTensor(data.tags2IDs(y))) if torch.argmax(ix).item() == iy.item()])
-        accuracy = sum_corr / total_tagged
-        if accuracy > best_current_acc:
-            best_current_acc = accuracy
-            print("====\nBEST ACCURACY CHANGED : {}\n====".format(best_current_acc))
-            torch.save(tagger, args.parfile+'.rnn')
-        else:
-            print('====\nACCURACY NOT IMPROVED\n====')
+            accuracy = dev_evaluate(x, y, tagger, total_tagged, sum_corr)
+        best_current_acc = check_accuracy(accuracy, best_current_acc, tagger)
 
 if __name__ == '__main__':
     
@@ -73,4 +79,4 @@ if __name__ == '__main__':
 
     data = tg.Data(args.trainfile, args.devfile, args.num_words)
     tagger = tg.TaggerModel(args.num_words, data.numTags, args.emb_size, args.rnn_size, args.dropout_rate)
-    train(data, tagger, args.num_epochs)
+    train(data, tagger, args.num_epochs, torch.optim.SGD(tagger.parameters(), lr=args.learning_rate))
