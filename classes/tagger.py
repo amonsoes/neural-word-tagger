@@ -46,7 +46,7 @@ class Data:
             self.word_id = {w[0] : e+1 for e,w in enumerate(wordFreq.most_common(numwords))}
             #self.word_id['UNK'] will be implicitly 0
             self.tag_id = {t : e+1 for e,t in enumerate(tag_set)}
-            self.tag_id['UNK'] = 0
+            # unknown tag will be implicitly 0 self.tag_id['UNK'] = 0
             self.id_tag = { i : t for t,i in self.tag_id.items()}
             return sents
         return sents
@@ -67,10 +67,10 @@ class Data:
         return [self.word_id.get(w, 0) for w in words]
         
     def tags2IDs(self, tags):
-        return [self.tag_id[t] for t in tags]
+        return [self.tag_id.get(t, 0) for t in tags]
     
     def IDs2tags(self, bestTagIDs):
-        return [self.id_tag[i] for i in bestTagIDs]
+        return [self.id_tag.get(i, 0) for i in bestTagIDs]
     
     def store_parameters(self, path):
         with open(path, 'w+', encoding='utf-8') as f:
