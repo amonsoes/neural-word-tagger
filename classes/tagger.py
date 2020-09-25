@@ -24,6 +24,7 @@ class Data:
         self.trainSentences = self.readData(trainFile, True, numWords)
         self.devSentences = self.readData(devFile, False)
         self.numTags = len(self.tag_id)
+        print('possible classes:', self.numTags)
         
     def readData(self, file, train, numwords=None):
         if train:
@@ -95,7 +96,7 @@ class TaggerModel(nn.Module):
         self.embedding_layer = nn.Embedding(numWords+1, embSize)
         self.lstm = nn.LSTM(embSize, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
-        self.fc = nn.Linear(rnnSize*2, numTags)
+        self.fc = nn.Linear(rnnSize*2, numTags+1)
         self.device = torch.device("cuda" if has_gpu else "cpu")
         
     def forward(self, input):
