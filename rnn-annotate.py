@@ -6,6 +6,7 @@ from classes import tagger as tg
 parser = argparse.ArgumentParser()
 parser.add_argument('path_param', type=str, help='Set path to initialize the data object and the stored RNN tagger model.')
 parser.add_argument('path_sents', type=str, help='Set path to sentences to annontate')
+
 args = parser.parse_args()
 
 

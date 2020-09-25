@@ -96,7 +96,7 @@ class TaggerModel(nn.Module):
         self.lstm = nn.LSTM(embSize, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
         self.fc = nn.Linear(rnnSize*2, numTags)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if args.gpu else "cpu")
         
     def forward(self, input):
         input = input.cuda()
@@ -126,12 +126,24 @@ def run_test():
     
     print("\n====== Tagger class functionality successfully tested ======\n")
     
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+    
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
     parser.add_argument('--parfile', type=str, help='set file to load/dump data attributes. Needs suffix')
     parser.add_argument('--train', type=str, help='set training file')
     parser.add_argument('--dev', type=str, help='set dev file')
+    parser.add_argument('--gpu', type=str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
 
     args = parser.parse_args()
     run_test()

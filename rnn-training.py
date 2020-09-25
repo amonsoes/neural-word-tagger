@@ -5,16 +5,15 @@ import argparse
 from sys import argv
 from classes import tagger as tg
 
-def optimize(x, y, optimizer, model):
+def optimize(x, y, optimizer, model, data):
     optimizer.zero_grad()
     output = model(torch.LongTensor(data.words2IDs(x)))
     loss = torch.nn.CrossEntropyLoss().cuda()
     loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda())
     loss_output.backward()
-    print(loss_output)
     optimizer.step()
 
-def dev_evaluate(x, y, model, total_tagged, sum_corr):
+def dev_evaluate(x, y, model, data, total_tagged, sum_corr):
     total_tagged += len(y)
     output = tagger(torch.LongTensor(data.words2IDs(x)))
     sum_corr += sum([1 for ix,iy in zip(output,torch.LongTensor(data.tags2IDs(y))) if torch.argmax(ix).item() == iy.item()])
@@ -36,25 +35,15 @@ def train(data, tagger, numEpochs, optimizer):
     best_current_acc = 0.0
     for epoch in range(numEpochs):
         for x, y in data.trainSentences:
-            optimize(x, y, optimizer, tagger)
+            optimize(x, y, optimizer, tagger, data)
         random.shuffle(data.trainSentences)
         tagger.train(mode=False)
         total_tagged, sum_corr = 0, 0
         for x, y in data.devSentences:
-            accuracy = dev_evaluate(x, y, tagger, total_tagged, sum_corr)
+            accuracy = dev_evaluate(x, y, tagger,data, total_tagged, sum_corr)
         best_current_acc = check_accuracy(accuracy, best_current_acc, tagger)
 
 if __name__ == '__main__':
-    
-    def str2bool(v):
-        if isinstance(v, bool):
-            return v
-        if v.lower() in ('yes', 'true', 't', 'y', '1'):
-            return True
-        elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-            return False
-        else:
-            raise argparse.ArgumentTypeError('Boolean value expected.')
     
     parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
 
@@ -70,13 +59,13 @@ if __name__ == '__main__':
     parser.add_argument('--rnn_size', type=int, help='set the number of dimensions of the LSTM vector. This will impact the training speed, but also affects quality')
     parser.add_argument('--dropout_rate', type=float, help='set the dropout rate')
     parser.add_argument('--learning_rate', type=float, help='set the learning rate of the optimizer')
-    parser.add_argument('--gpu', type=str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
+    parser.add_argument('--gpu', type=tg.str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
 
     args = parser.parse_args()
     
     print('Initisalizing training...\n\n Parameters:\n')
     print('  NUMWORDS : {}\n  EMBSIZE : {}\n  RNNSIZE : {}\n  NUMEPOCHS :{}\n  DO_RATE :{}\n  L_RATE : {}\n  CUDA : {}\n\n'.format(args.num_words, args.emb_size, args.rnn_size, args.num_epochs, args.dropout_rate, args.learning_rate, args.gpu))
 
-    data = tg.Data(args.trainfile, args.devfile, args.num_words)
-    tagger = tg.TaggerModel(args.num_words, data.numTags, args.emb_size, args.rnn_size, args.dropout_rate)
-    train(data, tagger, args.num_epochs, torch.optim.SGD(tagger.parameters(), lr=args.learning_rate))
+    dataset = tg.Data(args.trainfile, args.devfile, args.num_words)
+    tagger = tg.TaggerModel(args.num_words, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate)
+    train(dataset, tagger, args.num_epochs, torch.optim.SGD(tagger.parameters(), lr=args.learning_rate))
