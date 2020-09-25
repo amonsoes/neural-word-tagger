@@ -90,21 +90,28 @@ class Data:
 
 class TaggerModel(nn.Module):
     
-    def __init__(self, numWords, numTags, embSize, rnnSize, dropoutRate):
+    def __init__(self, numWords, numTags, embSize, rnnSize, dropoutRate, has_gpu):
         super(TaggerModel, self).__init__()
         self.embedding_layer = nn.Embedding(numWords+1, embSize)
         self.lstm = nn.LSTM(embSize, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
         self.fc = nn.Linear(rnnSize*2, numTags)
-        self.device = torch.device("cuda" if args.gpu else "cpu")
+        self.device = torch.device("cuda" if has_gpu else "cpu")
         
     def forward(self, input):
-        input = input.cuda()
-        embeddings = self.embedding_layer(input).cuda()
-        do_embeddings = self.dropout(embeddings).cuda()
-        output, _ = self.lstm(torch.unsqueeze(do_embeddings, dim=0))
-        do_vector = self.dropout(torch.squeeze(output.cuda(), dim=0)).cuda()
-        output = self.fc(do_vector).cuda()
+        if self.device == "cuda":
+            input = input.cuda()
+            embeddings = self.embedding_layer(input).cuda()
+            do_embeddings = self.dropout(embeddings).cuda()
+            output, _ = self.lstm(torch.unsqueeze(do_embeddings, dim=0))
+            do_vector = self.dropout(torch.squeeze(output.cuda(), dim=0)).cuda()
+            output = self.fc(do_vector).cuda()
+        else:
+            embeddings = self.embedding_layer(input)
+            do_embeddings = self.dropout(embeddings)
+            output, _ = self.lstm(torch.unsqueeze(do_embeddings, dim=0))
+            do_vector = self.dropout(torch.squeeze(output, dim=0))
+            output = self.fc(do_vector)
         return output
         
         

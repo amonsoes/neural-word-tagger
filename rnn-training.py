@@ -5,11 +5,13 @@ import argparse
 from sys import argv
 from classes import tagger as tg
 
+
 def optimize(x, y, optimizer, model, data):
     optimizer.zero_grad()
     output = model(torch.LongTensor(data.words2IDs(x)))
-    loss = torch.nn.CrossEntropyLoss().cuda()
-    loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda())
+    loss = torch.nn.CrossEntropyLoss().cuda() if args.gpu else torch.nn.CrossEntropyLoss()
+    loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda()) if args.gpu else loss(output, torch.LongTensor(data.tags2IDs(y)))
+    print(loss_output)
     loss_output.backward()
     optimizer.step()
 
@@ -67,5 +69,5 @@ if __name__ == '__main__':
     print('  NUMWORDS : {}\n  EMBSIZE : {}\n  RNNSIZE : {}\n  NUMEPOCHS :{}\n  DO_RATE :{}\n  L_RATE : {}\n  CUDA : {}\n\n'.format(args.num_words, args.emb_size, args.rnn_size, args.num_epochs, args.dropout_rate, args.learning_rate, args.gpu))
 
     dataset = tg.Data(args.trainfile, args.devfile, args.num_words)
-    tagger = tg.TaggerModel(args.num_words, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate)
+    tagger = tg.TaggerModel(args.num_words, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate, args.gpu)
     train(dataset, tagger, args.num_epochs, torch.optim.SGD(tagger.parameters(), lr=args.learning_rate))
