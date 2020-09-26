@@ -15,16 +15,15 @@ class Data:
         else:
             self.init_train(*args)
     
-    def init_test(self, *args):
-        with open(args.parfile, 'r',) as f:
-            self.tag_id, self.word_id = json.load(f)
+    def init_test(self, file):
+        with open(file, 'r', encoding='utf-8') as f:
+            self.word_id, self.tag_id = json.load(f)
         self.numTags = len(self.tag_id.keys())
     
     def init_train(self,trainFile, devFile, numWords):
         self.trainSentences = self.readData(trainFile, True, numWords)
         self.devSentences = self.readData(devFile, False)
         self.numTags = len(self.tag_id)
-        print('possible classes:', self.numTags)
         
     def readData(self, file, train, numwords=None):
         if train:
@@ -100,7 +99,7 @@ class TaggerModel(nn.Module):
         self.device = torch.device("cuda" if has_gpu else "cpu")
         
     def forward(self, input):
-        if self.device == "cuda":
+        if self.device.type == 'cuda':
             input = input.cuda()
             embeddings = self.embedding_layer(input).cuda()
             do_embeddings = self.dropout(embeddings).cuda()
@@ -114,18 +113,20 @@ class TaggerModel(nn.Module):
             do_vector = self.dropout(torch.squeeze(output, dim=0))
             output = self.fc(do_vector)
         return output
+
+def store_data(trainfile, devfile, numwords):
+    data = Data(trainfile, devfile, numwords)
+    data.store_parameters(args.parfile+'.io')  
         
-        
-def run_test():
+def run_test(numwords):
     
-    NUMWORDS = 10000
     EMBSIZE = 200
     RNNSIZE = 200
     
     data = Data(args.parfile)
-    tagger = TaggerModel(NUMWORDS, data.numTags, EMBSIZE, RNNSIZE, 0.1)
-    
-    data.store_parameters(args.parfile+'.io')
+    tagger = TaggerModel(numwords, data.numTags, EMBSIZE, RNNSIZE, 0.1)
+
+
     
     print("\n====== Models successfully initialized ======\n")
     
@@ -152,7 +153,9 @@ if __name__ == '__main__':
     parser.add_argument('--train', type=str, help='set training file')
     parser.add_argument('--dev', type=str, help='set dev file')
     parser.add_argument('--gpu', type=str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
-
+    parser.add_argument('--numwords', type=int, help='set number of known words')
+    
     args = parser.parse_args()
-    run_test()
+    
+    store_data(args.train, args.dev, args.numwords)
     

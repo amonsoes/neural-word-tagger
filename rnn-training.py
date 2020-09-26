@@ -39,7 +39,6 @@ def train(data, tagger, numEpochs, optimizer):
         for x, y in data.trainSentences:
             optimize(x, y, optimizer, tagger, data)
         random.shuffle(data.trainSentences)
-        tagger.train(mode=False)
         total_tagged, sum_corr = 0, 0
         for x, y in data.devSentences:
             accuracy = dev_evaluate(x, y, tagger,data, total_tagged, sum_corr)

@@ -11,7 +11,9 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "--parfile=/Users/amonsoares/neural-word-tagger/saves/processed_data.io"
+                "--path_param=/Users/amonsoares/neural-word-tagger/saves/tagger",
+                "--path_sents=/Users/amonsoares/neural-word-tagger/test_data/annotate_set.txt"
+
             ]
         }
     ]
