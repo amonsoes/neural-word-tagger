@@ -19,6 +19,7 @@ class Data:
         with open(file, 'r', encoding='utf-8') as f:
             self.word_id, self.tag_id = json.load(f)
         self.numTags = len(self.tag_id.keys())
+        self.id_tag = { v : k for k, v in self.tag_id.items()}
     
     def init_train(self,trainFile, devFile, numWords):
         self.trainSentences = self.readData(trainFile, True, numWords)
