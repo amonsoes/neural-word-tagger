@@ -4,7 +4,6 @@ import argparse
 from classes import tagger as tg
 from classes import tools
 
-
 def annotate(path, data, tagger):
     sents = []
     sents_generator = data.sentences(path)

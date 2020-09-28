@@ -6,13 +6,11 @@ from sys import argv
 from classes import tagger as tg
 from classes import tools
 
-
 def optimize(x, y, optimizer, model, data):
     optimizer.zero_grad()
     output = model(torch.LongTensor(data.words2IDs(x)))
     loss = torch.nn.CrossEntropyLoss().cuda() if args.gpu else torch.nn.CrossEntropyLoss()
     loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda()) if args.gpu else loss(output, torch.LongTensor(data.tags2IDs(y)))
-    print(loss_output)
     loss_output.backward()
     optimizer.step()
 
@@ -26,8 +24,10 @@ def dev_evaluate(x, y, model, data, total_tagged, sum_corr):
 def check_accuracy(accuracy, best_current_accuracy, model):
     if accuracy > best_current_accuracy:
         best_current_accuracy = accuracy
-        print("====\nBEST ACCURACY CHANGED : {}\n====".format(best_current_accuracy))
+        print("\n====\nBEST ACCURACY CHANGED : {}\n====\n".format(best_current_accuracy))
         torch.save(model, args.parfile+'.rnn')
+    else:
+        print('====\nAccuracy unchanged.\n====')
     return best_current_accuracy
     
 def train(data, tagger, numEpochs, optimizer):
@@ -44,6 +44,7 @@ def train(data, tagger, numEpochs, optimizer):
         for x, y in data.devSentences:
             accuracy = dev_evaluate(x, y, tagger,data, total_tagged, sum_corr)
         best_current_acc = check_accuracy(accuracy, best_current_acc, tagger)
+
 
 if __name__ == '__main__':
     
@@ -73,4 +74,4 @@ if __name__ == '__main__':
     if save_dataset == 'y':
         dataset.store_parameters(args.parfile)
     tagger = tg.TaggerModel(args.num_words, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate, args.gpu)
-    train(dataset, tagger, args.num_epochs, torch.optim.SGD(tagger.parameters(), lr=args.learning_rate))
+    train(dataset, tagger, args.num_epochs, torch.optim.Adam(tagger.parameters(), lr=args.learning_rate))

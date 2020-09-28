@@ -7,9 +7,7 @@ from collections import Counter
 
 from . import tools
 
-
 class Data:
-    
     
     def __init__(self, *args):
         if len(args) == 1:
@@ -65,7 +63,6 @@ class Data:
                     word = line.strip()
                     sent.append(word)
                     
-    
     def words2IDs(self, words):
         return [self.word_id.get(w, 0) for w in words]
         
@@ -128,8 +125,6 @@ def run_test(numwords):
     
     data = Data(args.parfile)
     tagger = TaggerModel(numwords, data.numTags, EMBSIZE, RNNSIZE, 0.1)
-
-
     
     print("\n====== Models successfully initialized ======\n")
     
