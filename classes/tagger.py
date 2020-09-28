@@ -5,6 +5,8 @@ import argparse
 from torch import nn
 from collections import Counter
 
+from . import tools
+
 
 class Data:
     
@@ -117,7 +119,7 @@ class TaggerModel(nn.Module):
 
 def store_data(trainfile, devfile, numwords):
     data = Data(trainfile, devfile, numwords)
-    data.store_parameters(args.parfile+'.io')  
+    data.store_parameters(tools.handle_path_coll(args.parfile+'.io'))
         
 def run_test(numwords):
     
@@ -135,25 +137,15 @@ def run_test(numwords):
     print(tagger(torch.LongTensor([2,5,12])).size())
     
     print("\n====== Tagger class functionality successfully tested ======\n")
-    
 
-def str2bool(v):
-    if isinstance(v, bool):
-        return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-        return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-        return False
-    else:
-        raise argparse.ArgumentTypeError('Boolean value expected.')
-    
+
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(description='Set hyperparams for tagger RNN')
     parser.add_argument('--parfile', type=str, help='set file to load/dump data attributes. Needs suffix')
     parser.add_argument('--train', type=str, help='set training file')
     parser.add_argument('--dev', type=str, help='set dev file')
-    parser.add_argument('--gpu', type=str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
+    parser.add_argument('--gpu', type=tools.str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
     parser.add_argument('--numwords', type=int, help='set number of known words')
     
     args = parser.parse_args()

@@ -4,6 +4,7 @@ import argparse
 
 from sys import argv
 from classes import tagger as tg
+from classes import tools
 
 
 def optimize(x, y, optimizer, model, data):
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     parser.add_argument('--rnn_size', type=int, help='set the number of dimensions of the LSTM vector. This will impact the training speed, but also affects quality')
     parser.add_argument('--dropout_rate', type=float, help='set the dropout rate')
     parser.add_argument('--learning_rate', type=float, help='set the learning rate of the optimizer')
-    parser.add_argument('--gpu', type=tg.str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
+    parser.add_argument('--gpu', type=tools.str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
 
     args = parser.parse_args()
     
@@ -68,5 +69,8 @@ if __name__ == '__main__':
     print('  NUMWORDS : {}\n  EMBSIZE : {}\n  RNNSIZE : {}\n  NUMEPOCHS :{}\n  DO_RATE :{}\n  L_RATE : {}\n  CUDA : {}\n\n'.format(args.num_words, args.emb_size, args.rnn_size, args.num_epochs, args.dropout_rate, args.learning_rate, args.gpu))
 
     dataset = tg.Data(args.trainfile, args.devfile, args.num_words)
+    save_dataset = input('Do you want to save the dataset yes <y>, no <n> ?')
+    if save_dataset == 'y':
+        dataset.store_parameters(args.parfile)
     tagger = tg.TaggerModel(args.num_words, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate, args.gpu)
     train(dataset, tagger, args.num_epochs, torch.optim.SGD(tagger.parameters(), lr=args.learning_rate))
