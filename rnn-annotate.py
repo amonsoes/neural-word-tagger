@@ -5,10 +5,12 @@ from classes import tagger as tg
 
 
 def annotate(path, data, tagger):
+    sents = []
     sents_generator = data.sentences(path)
     for sent in sents_generator:
         output = tagger(torch.LongTensor(data.words2IDs(sent)))
-        yield (sent,data.IDs2tags(output))
+        sents.append((sent,output))
+    return sents
         
 if __name__ == '__main__':
     
@@ -21,7 +23,10 @@ if __name__ == '__main__':
     
     data = tg.Data(args.path_param+'.io')
     model = torch.load(args.path_param+'.rnn') if args.gpu else torch.load(args.path_param+'.rnn', map_location=torch.device('cpu') )
-    output_generator = annotate(args.path_sents, data, model)
-    for sent, output in output_generator:
+    if not args.gpu:
+        model.device = torch.device('cpu')
+    output_return = annotate(args.path_sents, data, model)
+    for sent, output in output_return:
+        tags = data.IDs2tags([int(torch.argmax(tensor)) for tensor in output])
         for i in range(0,len(sent)):
-            print(sent[i],output[i])
+            print(sent[i]," : ", tags[i])
