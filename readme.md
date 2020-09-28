@@ -1,6 +1,6 @@
 ## Neural Word Tagger
 
-# This is an algorithm to train and use an Long Short Term Memory Neural Network to perform word tagging on a sentence level
+### This is an algorithm to train and use an Long Short Term Memory Neural Network to perform word tagging on a sentence level
 
 Usage: **through CLI**
 
