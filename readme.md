@@ -48,3 +48,4 @@ example:
 `python3.7 rnn-annotate.py --path_param ./saves/tagger --path_sents ./test_data/annotate_set.txt --gpu False
 `
 
+Highest observed accuracy with word-based NN : 83,33 %
