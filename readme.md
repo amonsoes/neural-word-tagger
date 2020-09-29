@@ -48,4 +48,17 @@ example:
 `python3.7 rnn-annotate.py --path_param ./saves/tagger --path_sents ./test_data/annotate_set.txt --gpu False
 `
 
-Highest observed accuracy with word-based NN : 83,33 %
+
+Highest observed TRAINING accuracy with word-based NN : 83,33 %
+Parameters used:
+
+-  NUMWORDS : 20000
+-  EMBSIZE : 300
+-  RNNSIZE : 500
+-  NUMEPOCHS :5
+-  DO_RATE :0.4
+-  L_RATE : 0.001
+-  CUDA : True
+-  optimizer: Adam
+
+
