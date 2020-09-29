@@ -21,14 +21,14 @@ class Data:
         self.numTags = len(self.tag_id.keys())
         self.id_tag = { v : k for k, v in self.tag_id.items()}
     
-    def init_train(self,trainFile, devFile, numWords):
-        self.trainSentences = self.readData(trainFile, True, numWords)
+    def init_train(self,trainFile, devFile, numChar):
+        self.trainSentences = self.readData(trainFile, True, numChar)
         self.devSentences = self.readData(devFile, False)
         self.numTags = len(self.tag_id)
         
-    def readData(self, file, train, numwords=None):
+    def readData(self, file, train, numchars=None):
         if train:
-            wordFreq = Counter()
+            charFreq = Counter()
             tag_set = set()
         with open(file, 'r', encoding='utf-8') as f:
             sents, words, tags = [], [], []
@@ -41,10 +41,11 @@ class Data:
                     words.append(word)
                     tags.append(tag)
                     if train:
-                        wordFreq[word] += 1
+                        for char in word:
+                            charFreq[char] += 1
                         tag_set.add(tag)
         if train:
-            self.word_id = {w[0] : e+1 for e,w in enumerate(wordFreq.most_common(numwords))}
+            self.char_id = {w : e+1 for e,w in enumerate(charFreq) if charFreq[w] > 1}
             #self.word_id['UNK'] will be implicitly 0
             self.tag_id = {t : e+1 for e,t in enumerate(tag_set)}
             # unknown tag will be implicitly 0 self.tag_id['UNK'] = 0
@@ -63,8 +64,13 @@ class Data:
                     word = line.strip()
                     sent.append(word)
                     
-    def words2IDs(self, words):
-        return [self.word_id.get(w, 0) for w in words]
+    def words2IDvecs(self, words):
+        pref_suff = [(w[:10],w[len(w)-10:]) if len(w) > 10 else (w+' '*(10-len(w)), ' '*(10-len(w))+w) for w in words]
+        p_mat, s_mat = [], []
+        for pref, suff in pref_suff:
+            p_mat.append([self.char_id.get(char, 0) for char in pref[::-1]])
+            s_mat.append([self.char_id.get(char,0) for char in suff])
+        return torch.LongTensor(p_mat), torch.LongTensor(s_mat)
         
     def tags2IDs(self, tags):
         return [self.tag_id.get(t, 0) for t in tags]
