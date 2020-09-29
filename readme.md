@@ -49,7 +49,7 @@ example:
 `
 
 
-Highest observed TRAINING accuracy with word-based NN : 83,33 %
+Highest observed TRAINING accuracy with word-based NN : 83,33 % after 3 epochs
 Parameters used:
 
 -  NUMWORDS : 20000
