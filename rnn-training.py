@@ -11,6 +11,7 @@ def optimize(x, y, optimizer, model, data):
     output = model(torch.LongTensor(data.words2IDs(x)))
     loss = torch.nn.CrossEntropyLoss().cuda() if args.gpu else torch.nn.CrossEntropyLoss()
     loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda()) if args.gpu else loss(output, torch.LongTensor(data.tags2IDs(y)))
+    print(loss_output)
     loss_output.backward()
     optimizer.step()
 
