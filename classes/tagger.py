@@ -96,10 +96,11 @@ class Data:
 
 class TaggerModel(nn.Module):
     
-    def __init__(self, numWords, numTags, embSize, rnnSize, dropoutRate, has_gpu):
+    def __init__(self, numChars, numTags, embSize, rnnSize, dropoutRate, has_gpu):
         super(TaggerModel, self).__init__()
-        self.embedding_layer = nn.Embedding(numWords+1, embSize)
-        self.lstm = nn.LSTM(embSize, rnnSize, bidirectional=True, batch_first=True)
+        self.embedding = nn.Embedding(numChars+1, embSize)
+        self.char_lstm = nn.LSTM(embSize ,rnnSize, batch_first=True)
+        self.lstm = nn.LSTM(rnnSize*2, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
         self.fc = nn.Linear(rnnSize*2, numTags+1)
         self.device = torch.device("cuda" if has_gpu else "cpu")
