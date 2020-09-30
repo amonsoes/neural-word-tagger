@@ -57,7 +57,6 @@ if __name__ == '__main__':
 
     #optional args
     parser.add_argument('--num_epochs', type=int, help='set the number of epochs of the training')
-    parser.add_argument('--num_words', type=int, help='set the number of words. This will impact the training speed, but also affects quality')
     parser.add_argument('--emb_size', type=int, help='set the number of dimensions of the embedding matrix. This will impact the training speed, but also affects quality')
     parser.add_argument('--rnn_size', type=int, help='set the number of dimensions of the LSTM vector. This will impact the training speed, but also affects quality')
     parser.add_argument('--dropout_rate', type=float, help='set the dropout rate')
@@ -67,11 +66,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     print('Initisalizing training...\n\n Parameters:\n')
-    print('  NUMWORDS : {}\n  EMBSIZE : {}\n  RNNSIZE : {}\n  NUMEPOCHS :{}\n  DO_RATE :{}\n  L_RATE : {}\n  CUDA : {}\n\n'.format(args.num_words, args.emb_size, args.rnn_size, args.num_epochs, args.dropout_rate, args.learning_rate, args.gpu))
+    print('  EMBSIZE : {}\n  RNNSIZE : {}\n  NUMEPOCHS :{}\n  DO_RATE :{}\n  L_RATE : {}\n  CUDA : {}\n\n'.format(args.num_words, args.emb_size, args.rnn_size, args.num_epochs, args.dropout_rate, args.learning_rate, args.gpu))
 
     dataset = tg.Data(args.trainfile, args.devfile, args.num_words)
     save_dataset = input('Do you want to save the dataset yes <y>, no <n> ?')
     if save_dataset == 'y':
         dataset.store_parameters(args.parfile)
-    tagger = tg.TaggerModel(args.num_words, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate, args.gpu)
+    tagger = tg.TaggerModel(len(dataset.char_id)+1, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate, args.gpu)
     train(dataset, tagger, args.num_epochs, torch.optim.Adam(tagger.parameters(), lr=args.learning_rate))

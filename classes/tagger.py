@@ -21,12 +21,12 @@ class Data:
         self.numTags = len(self.tag_id.keys())
         self.id_tag = { v : k for k, v in self.tag_id.items()}
     
-    def init_train(self,trainFile, devFile, numChar):
-        self.trainSentences = self.readData(trainFile, True, numChar)
+    def init_train(self,trainFile, devFile):
+        self.trainSentences = self.readData(trainFile, True)
         self.devSentences = self.readData(devFile, False)
         self.numTags = len(self.tag_id)
         
-    def readData(self, file, train, numchars=None):
+    def readData(self, file, train):
         if train:
             charFreq = Counter()
             tag_set = set()
@@ -120,17 +120,17 @@ class TaggerModel(nn.Module):
         output = self.fc(do_vector).to(self.device)
         return output
 
-def store_data(trainfile, devfile, numwords):
-    data = Data(trainfile, devfile, numwords)
+def store_data(trainfile, devfile):
+    data = Data(trainfile, devfile)
     data.store_parameters(tools.handle_path_coll(args.parfile+'.io'))
         
-def run_test(numwords):
+def run_test():
     
     EMBSIZE = 200
     RNNSIZE = 200
     
     data = Data(args.parfile)
-    tagger = TaggerModel(numwords, data.numTags, EMBSIZE, RNNSIZE, 0.1)
+    tagger = TaggerModel(data.numTags, EMBSIZE, RNNSIZE, 0.1)
     
     print("\n====== Models successfully initialized ======\n")
     
@@ -147,9 +147,8 @@ if __name__ == '__main__':
     parser.add_argument('--train', type=str, help='set training file')
     parser.add_argument('--dev', type=str, help='set dev file')
     parser.add_argument('--gpu', type=tools.str2bool, nargs='?', const=True, default=False, help='set True if cuda-able GPU is available. Else set False')
-    parser.add_argument('--numwords', type=int, help='set number of known words')
     
     args = parser.parse_args()
     
-    store_data(args.train, args.dev, args.numwords)
+    store_data(args.train, args.dev)
     
