@@ -69,7 +69,7 @@ class Data:
         p_mat, s_mat = [], []
         for pref, suff in pref_suff:
             p_mat.append([self.char_id.get(char, 0) for char in pref[::-1]])
-            s_mat.append([self.char_id.get(char,0) for char in suff])
+            s_mat.append([self.char_id.get(char, 0) for char in suff])
         return torch.LongTensor(p_mat), torch.LongTensor(s_mat)
         
     def tags2IDs(self, tags):
@@ -98,27 +98,26 @@ class TaggerModel(nn.Module):
     
     def __init__(self, numChars, numTags, embSize, rnnSize, dropoutRate, has_gpu):
         super(TaggerModel, self).__init__()
-        self.embedding = nn.Embedding(numChars+1, embSize)
-        self.char_lstm = nn.LSTM(embSize ,rnnSize, batch_first=True)
+        self.embedding = nn.Embedding(numChars, embSize)
+        self.forward_lstm = nn.LSTM(embSize, rnnSize, batch_first=True)
+        self.backward_lstm = nn.LSTM(embSize, rnnSize, batch_first=True)
         self.lstm = nn.LSTM(rnnSize*2, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
         self.fc = nn.Linear(rnnSize*2, numTags+1)
         self.device = torch.device("cuda" if has_gpu else "cpu")
         
     def forward(self, input):
-        if self.device.type == 'cuda':
-            input = input.cuda()
-            embeddings = self.embedding_layer(input).cuda()
-            do_embeddings = self.dropout(embeddings).cuda()
-            output, _ = self.lstm(torch.unsqueeze(do_embeddings, dim=0))
-            do_vector = self.dropout(torch.squeeze(output.cuda(), dim=0)).cuda()
-            output = self.fc(do_vector).cuda()
-        else:
-            embeddings = self.embedding_layer(input)
-            do_embeddings = self.dropout(embeddings)
-            output, _ = self.lstm(torch.unsqueeze(do_embeddings, dim=0))
-            do_vector = self.dropout(torch.squeeze(output, dim=0))
-            output = self.fc(do_vector)
+        pref_mat, suff_mat = input
+        pref_mat, suff_mat = pref_mat.to(self.device), suff_mat.to(self.device)
+        pref_embeddings, suff_embeddings = self.embedding(pref_mat).to(self.device), self.embedding(suff_mat).to(self.device)
+        pref_do_embeddings = self.dropout(pref_embeddings).to(self.device)
+        suff_do_embeddings = self.dropout(suff_embeddings).to(self.device)
+        pref_lstm_out,_ = self.forward_lstm(pref_do_embeddings)
+        suff_lstm_out,_ = self.backward_lstm(suff_do_embeddings)
+        concat_pref_suff = torch.cat((pref_lstm_out.to(self.device)[:,-1,:], suff_lstm_out.to(self.device)[:,-1,:]),1).to(self.device)
+        output, _ = self.lstm(torch.unsqueeze(concat_pref_suff, dim=0))
+        do_vector = self.dropout(torch.squeeze(output.to(self.device), dim=0)).to(self.device)
+        output = self.fc(do_vector).to(self.device)
         return output
 
 def store_data(trainfile, devfile, numwords):
