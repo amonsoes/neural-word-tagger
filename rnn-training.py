@@ -66,9 +66,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     print('Initisalizing training...\n\n Parameters:\n')
-    print('  EMBSIZE : {}\n  RNNSIZE : {}\n  NUMEPOCHS :{}\n  DO_RATE :{}\n  L_RATE : {}\n  CUDA : {}\n\n'.format(args.num_words, args.emb_size, args.rnn_size, args.num_epochs, args.dropout_rate, args.learning_rate, args.gpu))
+    print('  EMBSIZE : {}\n  RNNSIZE : {}\n  NUMEPOCHS :{}\n  DO_RATE :{}\n  L_RATE : {}\n  CUDA : {}\n\n'.format(args.emb_size, args.rnn_size, args.num_epochs, args.dropout_rate, args.learning_rate, args.gpu))
 
-    dataset = tg.Data(args.trainfile, args.devfile, args.num_words)
+    dataset = tg.Data(args.trainfile, args.devfile)
     save_dataset = input('Do you want to save the dataset yes <y>, no <n> ?')
     if save_dataset == 'y':
         dataset.store_parameters(args.parfile)
