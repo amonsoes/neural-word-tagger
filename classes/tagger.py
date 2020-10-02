@@ -98,12 +98,12 @@ class TaggerModel(nn.Module):
     
     def __init__(self, numChars, numTags, embSize, rnnSize, dropoutRate, has_gpu):
         super(TaggerModel, self).__init__()
-        self.embedding = nn.Embedding(numChars, embSize)
+        self.embedding = nn.Embedding(numChars+1, embSize)
         self.forward_lstm = nn.LSTM(embSize, rnnSize, batch_first=True)
         self.backward_lstm = nn.LSTM(embSize, rnnSize, batch_first=True)
         self.lstm = nn.LSTM(rnnSize*2, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
-        self.fc = nn.Linear(rnnSize*2, numTags+1)
+        self.fc = nn.Linear(rnnSize*2, numTags+2)
         self.device = torch.device("cuda" if has_gpu else "cpu")
         
     def forward(self, input):

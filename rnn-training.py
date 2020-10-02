@@ -9,8 +9,9 @@ from classes import tools
 def optimize(x, y, optimizer, model, data):
     optimizer.zero_grad()
     output = model(data.words2IDvecs(x))
-    loss = torch.nn.CrossEntropyLoss().cuda() if args.gpu else torch.nn.CrossEntropyLoss()
-    loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).cuda()) if args.gpu else loss(output, torch.LongTensor(data.tags2IDs(y)))
+    loss = torch.nn.CrossEntropyLoss().to(model.device)
+    loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).to(model.device))
+    print(loss_output)
     loss_output.backward()
     optimizer.step()
 
@@ -72,5 +73,6 @@ if __name__ == '__main__':
     save_dataset = input('Do you want to save the dataset yes <y>, no <n> ?')
     if save_dataset == 'y':
         dataset.store_parameters(args.parfile)
-    tagger = tg.TaggerModel(len(dataset.char_id)+1, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate, args.gpu)
+    tagger = tg.TaggerModel(len(dataset.char_id)+2, dataset.numTags, args.emb_size, args.rnn_size, args.dropout_rate, args.gpu)
+    print('training...')
     train(dataset, tagger, args.num_epochs, torch.optim.Adam(tagger.parameters(), lr=args.learning_rate))
