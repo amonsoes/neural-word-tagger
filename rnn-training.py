@@ -17,7 +17,7 @@ def optimize(x, y, optimizer, model, data):
 
 def dev_evaluate(x, y, model, data, total_tagged, sum_corr):
     total_tagged += len(y)
-    output = tagger(torch.LongTensor(data.words2IDs(x)))
+    output = tagger(torch.LongTensor(data.words2IDvecs(x)))
     sum_corr += sum([1 for ix,iy in zip(output,torch.LongTensor(data.tags2IDs(y))) if torch.argmax(ix).item() == iy.item()])
     accuracy = sum_corr / total_tagged
     return accuracy
