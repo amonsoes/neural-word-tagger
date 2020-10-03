@@ -9,10 +9,8 @@ from classes import tools
 def optimize(x, y, optimizer, model, data):
     optimizer.zero_grad()
     output = model(data.words2IDvecs(x))
-    print(output.size())
     loss = torch.nn.CrossEntropyLoss().to(model.device)
     loss_output = loss(output, torch.LongTensor(data.tags2IDs(y)).to(model.device))
-    print(loss_output)
     loss_output.backward()
     optimizer.step()
 
