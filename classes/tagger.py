@@ -17,7 +17,7 @@ class Data:
     
     def init_test(self, file):
         with open(file, 'r', encoding='utf-8') as f:
-            self.word_id, self.tag_id = json.load(f)
+            self.char_id, self.tag_id = json.load(f)
         self.numTags = len(self.tag_id.keys())
         self.id_tag = { v : k for k, v in self.tag_id.items()}
     
@@ -80,8 +80,8 @@ class Data:
         return [self.id_tag.get(i, 0) for i in bestTagIDs]
     
     def store_parameters(self, path):
-        with open(path, 'w+', encoding='utf-8') as f:
-            json.dump((self.word_id, self.tag_id), f)
+        with open(tools.handle_path_coll(path+'.io'), 'w+', encoding='utf-8') as f:
+            json.dump((self.char_id, self.tag_id), f)
         
     def run_test(self):
         for words, tags in self.trainSentences:
@@ -123,7 +123,7 @@ class TaggerModel(nn.Module):
 
 def store_data(trainfile, devfile):
     data = Data(trainfile, devfile)
-    data.store_parameters(tools.handle_path_coll(args.parfile+'.io'))
+    data.store_parameters(tools.handle_path_coll(args.parfile))
         
 def run_test():
     

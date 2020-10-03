@@ -20,13 +20,14 @@ def handle_path_coll(path):
                 while os.path.exists(path):
                     path_wo, ext = os.path.splitext(path)
                     path = path_wo + '_copy' + ext
+                print('file saved at: ', path)
                 return path
             elif user_input == 'o':
                 os.remove(path)
-                print(path)
+                print('file overwritten at: ', path)
                 return path
             else:
                 print('please enter valid option')
-                continue
     else:
+        print('file saved at: ', path)
         return path

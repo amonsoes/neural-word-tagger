@@ -11,14 +11,8 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "/Users/amonsoares/neural-word-tagger/data/train.short",
-                "/Users/amonsoares/neural-word-tagger/data/dev.tagged",
-                "/Users/amonsoares/neural-word-tagger/saves/",
-                "--num_epochs= 2",
-                "--emb_size= 300",
-                "--rnn_size= 400",
-                "--dropout_rate= 0.5",
-                "--learning_rate=0.001",
+                "--path_param=./saves/tagger",
+                "--path_sents=./test_data/annotate_set.txt",
                 "--gpu=False"
 
             ]
