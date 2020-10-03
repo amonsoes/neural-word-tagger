@@ -47,6 +47,7 @@ example:
 `python3.7 rnn-annotate.py --path_param ./saves/tagger --path_sents ./test_data/annotate_set.txt --gpu False
 `
 
+
 Best training accuracy observed: 95,8%
 Hyperparamerter used:
 
@@ -56,4 +57,5 @@ Hyperparamerter used:
 - --dropout_rate: 0.4
 - --learning_rate: 0.001
 - --gpu: True
+
 
