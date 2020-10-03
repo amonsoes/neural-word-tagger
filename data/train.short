@@ -1,0 +1,42 @@
+``	$(
+Ross	NE.Nom.Sg.Masc
+Perot	NE.Nom.Sg.Masc
+wäre	VAFIN.3.Sg.Past.Subj
+vielleicht	ADV
+ein	ART.Nom.Sg.Masc
+prächtiger	ADJA.Pos.Nom.Sg.Masc
+Diktator	NN.Nom.Sg.Masc
+''	$(
+
+Konzernchefs	NN.Nom.Pl.Masc
+lehnen	VVFIN.3.Pl.Pres.Ind
+den	ART.Acc.Sg.Masc
+Milliardär	NN.Acc.Sg.Masc
+als	APPR
+US-Präsidenten	NN.Acc.Sg.Masc
+ab	PTKVZ
+/	$(
+
+Texaner	NN.Nom.Sg.Masc
+gibt	VVFIN.3.Sg.Pres.Ind
+nur	ADV
+vage	ADJA.Pos.Acc.Sg.Fem
+Auskunft	NN.Acc.Sg.Fem
+über	APPR
+seine	PPOSAT.Acc.Sg.Fem
+Wirtschaftspolitik	NN.Acc.Sg.Fem
+
+Der	ART.Nom.Sg.Masc
+texanische	ADJA.Pos.Nom.Sg.Masc
+Milliardär	NN.Nom.Sg.Masc
+Ross	NE.Nom.Sg.Masc
+Perot	NE.Nom.Sg.Masc
+hat	VAFIN.3.Sg.Pres.Ind
+das	ART.Acc.Sg.Neut
+politische	ADJA.Pos.Acc.Sg.Neut
+Establishment	NN.Acc.Sg.Neut
+in	APPR
+Washington	NE.Dat.Sg.Neut
+aufgeschreckt	VVPP.Psp
+.	$.
+

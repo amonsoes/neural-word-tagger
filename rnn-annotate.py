@@ -8,7 +8,7 @@ def annotate(path, data, tagger):
     sents = []
     sents_generator = data.sentences(path)
     for sent in sents_generator:
-        output = tagger(torch.LongTensor(data.words2IDs(sent)))
+        output = tagger(data.words2IDvecs(sent))
         sents.append((sent,output))
     return sents
         

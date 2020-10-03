@@ -21,7 +21,6 @@ positional arguments:
 other arguments:
 
 - --num_epochs: number of epochs
-- --num_words: number of words known to the RNN
 - --emb_size: dimensionality of the embedding layer
 - --rnn_size: dimensionality of the hidden RNN-vector
 - --dropout_rate: introduces slight training error to fight overfitting
@@ -49,16 +48,14 @@ example:
 `
 
 
-Highest observed TRAINING accuracy with word-based NN : 83,33 % after 3 epochs
-Parameters used:
+Best training accuracy observed: 95,8%
+Hyperparamerter used:
 
--  NUMWORDS : 20000
--  EMBSIZE : 300
--  RNNSIZE : 500
--  NUMEPOCHS :5
--  DO_RATE :0.4
--  L_RATE : 0.001
--  CUDA : True
--  optimizer: Adam
+- --num_epochs: 3
+- --emb_size: 300
+- --rnn_size: 500
+- --dropout_rate: 0.4
+- --learning_rate: 0.001
+- --gpu: True
 
 
