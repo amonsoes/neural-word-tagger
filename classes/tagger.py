@@ -45,7 +45,8 @@ class Data:
                             charFreq[char] += 1
                         tag_set.add(tag)
         if train:
-            self.char_id = {w : e+1 for e,w in enumerate(charFreq) if charFreq[w] > 1}
+            charFreq_reduced = [k for k in charFreq if charFreq[k] > 1]
+            self.char_id = {w : e+1 for e,w in enumerate(charFreq_reduced)}
             #self.word_id['UNK'] will be implicitly 0
             self.tag_id = {t : e+1 for e,t in enumerate(tag_set)}
             # unknown tag will be implicitly 0 self.tag_id['UNK'] = 0
@@ -103,7 +104,7 @@ class TaggerModel(nn.Module):
         self.backward_lstm = nn.LSTM(embSize, rnnSize, batch_first=True)
         self.lstm = nn.LSTM(rnnSize*2, rnnSize, bidirectional=True, batch_first=True)
         self.dropout = nn.Dropout(dropoutRate)
-        self.fc = nn.Linear(rnnSize*2, numTags+2)
+        self.fc = nn.Linear(rnnSize*2, numTags+1)
         self.device = torch.device("cuda" if has_gpu else "cpu")
         
     def forward(self, input):

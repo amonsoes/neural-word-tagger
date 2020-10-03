@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "/Users/amonsoares/neural-word-tagger/data/train.tagged",
+                "/Users/amonsoares/neural-word-tagger/data/train.short",
                 "/Users/amonsoares/neural-word-tagger/data/dev.tagged",
                 "/Users/amonsoares/neural-word-tagger/saves/",
                 "--num_epochs= 2",
