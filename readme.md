@@ -21,7 +21,6 @@ positional arguments:
 other arguments:
 
 - --num_epochs: number of epochs
-- --num_words: number of words known to the RNN
 - --emb_size: dimensionality of the embedding layer
 - --rnn_size: dimensionality of the hidden RNN-vector
 - --dropout_rate: introduces slight training error to fight overfitting
@@ -47,4 +46,14 @@ example:
 
 `python3.7 rnn-annotate.py --path_param ./saves/tagger --path_sents ./test_data/annotate_set.txt --gpu False
 `
+
+Best training accuracy observed: 95,8%
+Hyperparamerter used:
+
+- --num_epochs: 3
+- --emb_size: 300
+- --rnn_size: 500
+- --dropout_rate: 0.4
+- --learning_rate: 0.001
+- --gpu: True
 
